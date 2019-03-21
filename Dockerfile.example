@@ -1,0 +1,4 @@
+FROM alpine:latest
+
+RUN touch .i-was-here
+CMD date

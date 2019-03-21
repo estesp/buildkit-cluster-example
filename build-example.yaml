@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: builder
+  name: builder
+spec:
+  selector:
+    matchLabels:
+      app: builder
+  template:
+    metadata:
+      labels:
+        app: builder
+    spec:
+      containers:
+      - image: estesp/buildexample:1.0
+        command: ["buildctl"]
+        args: ["--addr=tcp://buildkitd:1234", "build",
+             "--progress=plain",
+             "--frontend=dockerfile.v0",
+             "--frontend-opt", "filename=Dockerfile.example",
+             "--local", "context=.", "--local", "dockerfile=.",
+             "--exporter=image", "--exporter-opt", "name=estesp/mybkimg:latest", "--exporter-opt", "push=true"]
+        name: build-example
