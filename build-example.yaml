@@ -1,18 +1,11 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: batch/v1
+kind: Job
 metadata:
-  labels:
-    app: builder
   name: builder
 spec:
-  selector:
-    matchLabels:
-      app: builder
   template:
-    metadata:
-      labels:
-        app: builder
     spec:
+      restartPolicy: Never
       containers:
       - image: estesp/buildexample:1.0
         command: ["buildctl"]
@@ -23,3 +16,15 @@ spec:
              "--local", "context=.", "--local", "dockerfile=.",
              "--exporter=image", "--exporter-opt", "name=estesp/mybkimg:latest", "--exporter-opt", "push=true"]
         name: build-example
+        env:
+        - name: DOCKER_CONFIG
+          value: "/etc/docker"
+        volumeMounts:
+        - name: configjson
+          mountPath: "/etc/docker"
+          readOnly: true
+      volumes:
+      - name: configjson
+        secret:
+          secretName: dockerconfig
+  backoffLimit: 2
